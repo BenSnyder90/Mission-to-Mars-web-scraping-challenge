@@ -28,6 +28,7 @@ def init_browser():
 def scrape():
 
     browser = init_browser()
+    mars_data = {}
     #Scrape the NASA Mars News Site (https://mars.nasa.gov/news/) and collect the latest News Title and Paragraph Text. Assign the text to variables that you can reference later.
 
     #Parse the html of the site
@@ -39,14 +40,13 @@ def scrape():
 
     url = "https://mars.nasa.gov/news"
     browser.visit(url)
-    time.sleep(5)
+    time.sleep(3)
     html = browser.html
     soup = bs(html, 'html.parser')
 
     mars_title = soup.find_all('div', class_='content_title')[1].text
     mars_paragraph = soup.find_all('div', class_="article_teaser_body")[0].text
 
-    browser.quit()
 
     #Visit the url for JPL Featured Space Image here (https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars).
     #Use splinter to navigate the site and find the image url for the current Featured Mars Image and assign the url string to a variable called featured_image_url.
@@ -58,7 +58,6 @@ def scrape():
     #Use splinter to click on full size image
     #Parse HTML to get full URL and store in variable
 
-    browser=init_browser()
     url = 'https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars'
     browser.visit(url)
 
@@ -71,7 +70,6 @@ def scrape():
     featured_url = soup.find('img', class_='fancybox-image')['src']
     featured_image_url = 'https://www.jpl.nasa.gov'+featured_url
 
-    browser.quit()
 
 
     #Visit the Mars Weather twitter account here (https://twitter.com/marswxreport?lang=en) and scrape the latest Mars weather tweet from the page. Save the tweet text for the weather report as a variable called mars_weather
@@ -80,19 +78,18 @@ def scrape():
     #Parse HTML of the URL and use the find() funtion to get the tag of the latest tweet
     #Save it as a variable
 
-    browser=init_browser()
 
     url = 'https://twitter.com/marswxreport?lang=en'
     browser.visit(url)
 
-    time.sleep(5)
+    time.sleep(3)
 
     html = browser.html
     soup = bs(html, 'html.parser')
 
 
     mars_weather = soup.find_all('span', class_="css-901oao css-16my406 r-1qd0xha r-ad9z0x r-bcqeeo r-qvutc0")[27].text
-    browser.quit()
+
 
 
     #Visit the Mars Facts webpage here (https://space-facts.com/mars/) and use Pandas to scrape the table containing facts about the planet including Diameter, Mass, etc.
@@ -103,6 +100,7 @@ def scrape():
     #Make a dataframe of just the planet facts index 
 
     url = 'https://space-facts.com/mars/'
+    browser.visit(url)
     tables = pd.read_html(url)
 
     #First table appears to be info for Mars
@@ -110,8 +108,11 @@ def scrape():
 
     mars_df = tables[0]
 
-    mars_df.columns = ['Category','Value']
-    mars_table = mars_df.to_html(index=False)
+    mars_df.columns = ['Description','Value']
+
+    mars_df = mars_df.set_index('Description')
+
+    mars_table = mars_df.to_html(classes = 'table table-striped')
 
 
     # Mars Hemispheres
@@ -131,34 +132,34 @@ def scrape():
     #Append dictionary to list
     #End For
 
-    browser=init_browser()
 
     url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
     browser.visit(url)
-    hemi_list = []
+    mars_hemi = []
     html = browser.html
     soup = bs(html,'html.parser')
 
     hemi_links = soup.find_all('div', class_='item')
 
     for x in hemi_links:
-        
-        browser.click_link_by_partial_text('Enhanced')
-        html = browser.html
-        soup = bs(html,'html.parser')
-
-        image_url = soup.find('img', class_='wide-image')['src']
-        image_title = soup.find('h2',class_='title').text
+        image_title = x.find('h3').text
         image_title = image_title.replace('Enhanced','')
         image_title = image_title.rstrip(' ')
 
+        image_url = x.find('a')['href']
+        img_url = "https://astrogeology.usgs.gov"+ image_url
+
+        browser.visit(img_url)
+        html = browser.html
+        soup = bs(html,'html.parser')
+        hemi_img = soup.find('img', class_="wide-image")['src']
+            
         hemi_data = {
-            'img_url' : 'https://astrogeology.usgs.gov'+image_url,
+            'img_url' : 'https://astrogeology.usgs.gov'+hemi_img,
             'title': image_title
         }
-        
-        hemi_list.append(hemi_data)
-
+    
+        mars_hemi.append(hemi_data)
 
     #Store all of the scraped data into a Python dictionary
     mars_data = {
@@ -167,9 +168,12 @@ def scrape():
         'featured_img_url':featured_image_url,
         'mars_weather':mars_weather,
         'mars_table': mars_table,
-        #'mars_hemi': hemi_list
+        'mars_hemi': mars_hemi
     }
 
     browser.quit()
 
     return mars_data
+
+if __name__ == '__main__':
+    scrape()
