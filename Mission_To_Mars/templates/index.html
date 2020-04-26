@@ -10,31 +10,60 @@
 </head>
 
 <body>
+
+  <!--Use Jumbotron class and Bootstrapped button class as header-->
   <div class="container-fluid">
     <div class="jumbotron text-center">
       <h1>Mission to Mars</h1>
         <p><a class="btn btn-primary btn-lg" href="/scrape" role="button">Get Data!</a></p>
     </div>
 
-    <h2>Latest Mars News</h2>
-    <h3>{{facts.mars_title}}</h3>
+    <!--Print out the latest Mars News on the top row by itself-->
+    <div class="row">
+      <h2><b><u>Latest Mars News</u></div></h2>
+      <h3><b>{{facts.mars_title}}</b></h3>
       <p>{{facts.mars_paragraph}}</p><br><br>
-
-    <h2>Featured Mars Image</h2>
-      <img src="{{ facts.featured_img_url}}" alt="Featured Mars Pic"><br><br>
-    <h2>Current Mars Weather:</h2><br>
-      <p>{{facts.mars_weather}}</p><br><br>
-    <h3>Mars Facts:</h3><br>
-    <p>{{facts.mars_table | safe}}</p><br>
+    </div>
     
-    <h3>Mars Hemispheres</h3><br>
+    <!--Make a new row with the Featured Mars Image on the left side-->
+    <div class="row">
+      <div class="col-md-8">
+        <h2><u>Featured Mars Image</u></h2>
+        <img src="{{ facts.featured_img_url}}" alt="Featured Mars Pic">
+      </div>
+
+      <!--Print out the Mars Weather tweet on the right side of the page-->
+      <div class="col-md-4">
+        <div class="row">
+          <div class = "col-md-12">
+            <div class="panel panel-default">
+            <h3><b>Current Mars Weather:</b></h3><br>
+            <p>{{facts.mars_weather}}</p>
+            <hr>
+            </div>
+          </div>
+        </div>
+        
+
+        <!-- Print out the table of Mars facts on the right side of the page-->
+        <div class="row">
+          <div class="col-md-12">    
+              <h3><b>Mars Facts:</b></h3>
+              <p>{{facts.mars_table | safe}}</p><br>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mars Hemispheres: Use a For Loop to run through a 2x2 grid of the hemispheres, getting the full-res image and title for each.-->
+    <h2 class="text-center"><u>Mars Hemispheres</u></h2>
     {% for hemisphere in facts.mars_hemi %}
     <div class="col-md-6">
       <div class = "thumbnail">
         <img src='{{ hemisphere.img_url }}'>
       </div>
       <div class = 'caption'>
-        <p><b>{{hemisphere.title}}</b></p>
+        <h3><b>{{hemisphere.title}}</b></h3>
       </div>
     </div>
     {% endfor %}
