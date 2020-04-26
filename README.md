@@ -15,3 +15,7 @@ CWRU Data Analytics Bootcamp - HW 12
 * <b>chromedriver.exe</b> - Browser used by Splinter to parse HTML
 <b><h2>/templates/</b></h2>
 * <b>Index.html</b> - HTML page that displays the information parsed through various Mars websites and creates a dashboard of information. Styled using Bootstrapping
+----------------------
+## Results
+![Page1](Mission_To_Mars/site_results_1.PNG)
+![Page2](Mission_To_Mars/site_results_2.PNG)
